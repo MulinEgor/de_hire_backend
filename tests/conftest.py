@@ -2,7 +2,6 @@
 
 import asyncio
 import sys
-import uuid
 from typing import AsyncGenerator
 
 import pytest
@@ -16,12 +15,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-import src.auth.schemas as auth_schemas
-import src.users.schemas as user_schemas
-from src import utils
-from src.auth import JWTService
 from src.settings import settings
-from src.users import UserModel
 
 faker = Faker()
 
@@ -122,77 +116,3 @@ def output_to_stdout():
     """
 
     sys.stdout = sys.stderr
-
-
-# MARK: Users
-@pytest_asyncio.fixture
-async def user_db(session: AsyncSession) -> UserModel:
-    """Добавить пользователя в БД."""
-
-    user_db = UserModel(
-        id=str(uuid.uuid4()),
-        email=faker.email(),
-        hashed_password=utils.get_hash(faker.password()),
-    )
-    session.add(user_db)
-    await session.commit()
-
-    return user_db
-
-
-@pytest_asyncio.fixture
-async def user_admin_db(session: AsyncSession) -> UserModel:
-    """Добавить пользователя-администратора в БД."""
-
-    user_admin = UserModel(
-        id=str(uuid.uuid4()),
-        email=faker.email(),
-        hashed_password=utils.get_hash(faker.password()),
-        is_admin=True,
-    )
-    session.add(user_admin)
-    await session.commit()
-
-    return user_admin
-
-
-@pytest_asyncio.fixture
-async def user_create_data() -> user_schemas.UserReadAdminSchema:
-    """
-    Подготовленные данные для создания
-    пользователя в БД администратором.
-    """
-
-    return user_schemas.UserCreateAdminSchema(
-        email=faker.email(),
-        password=faker.password(),
-        is_admin=False,
-    )
-
-
-@pytest_asyncio.fixture
-async def user_update_data() -> user_schemas.UserUpdateAdminSchema:
-    """
-    Подготовленные данные для обновления
-    пользователя в БД администратором.
-    """
-
-    return user_schemas.UserUpdateAdminSchema(
-        email=faker.email(),
-        password=faker.password(),
-        is_admin=True,
-    )
-
-
-@pytest_asyncio.fixture
-async def user_jwt_tokens(user_db: UserModel) -> auth_schemas.JWTGetSchema:
-    """Создать JWT токены  для тестового пользователя."""
-
-    return await JWTService.create_tokens(user_id=user_db.id)
-
-
-@pytest_asyncio.fixture
-async def admin_jwt_tokens(user_admin_db: UserModel) -> auth_schemas.JWTGetSchema:
-    """Создать JWT токены  для тестового пользователя-администратора."""
-
-    return await JWTService.create_tokens(user_id=user_admin_db.id)
