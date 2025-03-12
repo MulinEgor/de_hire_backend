@@ -1,6 +1,8 @@
 """Основной модуль `conftest` для всех тестов."""
 
 import asyncio
+import datetime
+import random
 import sys
 from typing import AsyncGenerator
 
@@ -15,6 +17,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from src.jobs import Job, JobGetSchema, JobRepository, JobStatus
+from src.ratings import Rating, RatingRepository, RatingSchema, Role
+from src.resumes import Resume, ResumeCreateSchema, ResumeRepository
 from src.settings import settings
 
 faker = Faker()
@@ -116,3 +121,70 @@ def output_to_stdout():
     """
 
     sys.stdout = sys.stderr
+
+
+# MARK: Jobs
+@pytest.fixture()
+async def job_db(session: AsyncSession) -> Job:
+    """Создание работы в базе данных"""
+
+    job = await JobRepository.create(
+        session,
+        JobGetSchema(
+            id=random.randint(1, 1000),
+            employer_address=faker.word(),
+            payment=random.randint(1, 1000),
+            deadline=faker.date_time(),
+            description=faker.text(),
+            skills=[faker.word() for _ in range(random.randint(1, 10))],
+            applications=[],
+            employee_address=faker.word(),
+            status=JobStatus.COMPLETED,
+            created_at=faker.date_time(end_datetime=datetime.datetime.now()),
+        ),
+    )
+
+    await session.commit()
+
+    return job
+
+
+# MARK: Resumes
+@pytest.fixture()
+async def resume_db(session: AsyncSession, job_db: Job) -> Resume:
+    """Создание резюме в базе данных"""
+
+    resume = await ResumeRepository.create(
+        session,
+        ResumeCreateSchema(
+            person_address=job_db.employee_address,
+            role=Role.EMPLOYEE,
+            name=faker.name(),
+            description=faker.text(),
+        ),
+    )
+
+    await session.commit()
+
+    return resume
+
+
+# MARK: Ratings
+@pytest.fixture()
+async def rating_db(session: AsyncSession, job_db: Job) -> Rating:
+    """Создание рейтинга в базе данных"""
+
+    rating = await RatingRepository.create(
+        session,
+        RatingSchema(
+            job_id=job_db.id,
+            rated_person_address=job_db.employee_address,
+            score=random.randint(1, 5),
+            comment=faker.text(),
+            role=Role.EMPLOYEE,
+        ),
+    )
+
+    await session.commit()
+
+    return rating

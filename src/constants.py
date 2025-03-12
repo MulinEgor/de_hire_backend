@@ -2,6 +2,8 @@
 
 from sqlalchemy import TextClause, text
 
+from src.settings import settings
+
 # MARK: Security
 AUTH_HEADER_NAME: str = "X-Authorization"
 ALGORITHM: str = "HS256"
@@ -33,3 +35,7 @@ DB_NAMING_CONVENTION = {
 CURRENT_TIMESTAMP_UTC: TextClause = text("(CURRENT_TIMESTAMP AT TIME ZONE 'UTC')")
 DEFAULT_QUERY_OFFSET: int = 0
 DEFAULT_QUERY_LIMIT: int = 100
+
+# MARK: Ethereum
+WEBSOCKET_URL: str = f"wss://sepolia.infura.io/ws/v3/{settings.INFURA_PROJECT_ID}"
+ABI_URL: str = f"https://api-sepolia.etherscan.io/api?module=contract&action=getabi&address={settings.CONTRACT_ADDRESS}&apikey={settings.ETHERSCAN_API_KEY}"

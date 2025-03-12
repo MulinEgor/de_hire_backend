@@ -6,6 +6,9 @@ from fastapi.responses import HTMLResponse
 
 from src.constants import CORS_HEADERS, CORS_METHODS
 from src.healthcheck import health_check_router
+from src.jobs.router import router as jobs_router
+from src.ratings.router import router as ratings_router
+from src.resumes.router import router as resumes_router
 from src.settings import settings
 
 app = FastAPI(
@@ -25,6 +28,9 @@ app.add_middleware(
 
 available_routers = [
     health_check_router,
+    ratings_router,
+    resumes_router,
+    jobs_router,
 ]
 
 for router in available_routers:

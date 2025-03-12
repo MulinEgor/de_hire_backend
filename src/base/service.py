@@ -126,7 +126,7 @@ class BaseService(
         return schema_class.model_validate(obj_db)
 
     @classmethod
-    async def get_all(
+    async def get(
         cls,
         session: AsyncSession,
         query_params: types.GetQuerySchemaType,

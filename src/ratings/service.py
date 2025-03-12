@@ -1,18 +1,17 @@
 """Модуль для сервиса рейтингов"""
 
-import src.base.schemas as base_schemas
 import src.ratings.schemas as schemas
 from src.base.service import BaseService
 from src.ratings.models import Rating
 from src.ratings.repository import RatingRepository
 
 
-class JobService(
+class RatingService(
     BaseService[
         Rating,
         schemas.RatingSchema,
         schemas.RatingSchema,
-        base_schemas.PaginationBaseSchema,
+        schemas.RatingPaginationSchema,
         schemas.RatingListReadSchema,
         schemas.RatingSchema,
     ]

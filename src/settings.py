@@ -24,11 +24,10 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: str
 
-    # JWT
-    JWT_ACCESS_SECRET: str
-    JWT_REFRESH_SECRET: str
-    JWT_ACCESS_EXPIRE_MINUTES: int
-    JWT_REFRESH_EXPIRE_MINUTES: int
+    # Ethereum
+    INFURA_PROJECT_ID: str
+    ETHERSCAN_API_KEY: str
+    CONTRACT_ADDRESS: str
 
     @property
     def DATABASE_URL(self):
