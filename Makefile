@@ -1,15 +1,15 @@
 # Запуск и остановка dev сервисов
 build_dev:
-	docker compose --profile dev --env-file ./src/.env build
+	docker compose --profile dev --env-file .env build
 start_dev:
-	docker compose --profile dev --env-file ./src/.env up -d
+	docker compose --profile dev --env-file .env up -d
 stop_dev:
-	docker compose --profile dev --env-file ./src/.env down
+	docker compose --profile dev --env-file .env down
 # Запуск тестов
 test:
 	@EXIT_CODE=0; \
-	docker compose -f docker-compose.yml --env-file ./src/.env.test run --rm  app-test || EXIT_CODE=$$?; \
-	docker compose -f docker-compose.yml --env-file ./src/.env.test --profile test down --volumes; \
+	docker compose -f docker-compose.yml --env-file .env.test run --rm  app-test || EXIT_CODE=$$?; \
+	docker compose -f docker-compose.yml --env-file .env.test --profile test down --volumes; \
 	exit $$EXIT_CODE
 # Миграции
 migrate:
