@@ -2,8 +2,8 @@
 
 import httpx
 
-from src.ratings import Rating, RatingListReadSchema
-from src.ratings.router import router as rating_router
+from src.api.ratings.router import router as rating_router
+from src.core.ratings import Rating, RatingListReadSchema
 from tests.integration.conftest import BaseTestRouter
 
 

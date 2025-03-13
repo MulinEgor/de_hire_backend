@@ -5,11 +5,11 @@ from os.path import abspath, dirname
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from src.database import Base
-from src.jobs.models import Job
-from src.ratings.models import Rating
-from src.resumes.models import Resume
-from src.settings import settings
+from src.core.database import Base
+from src.core.jobs.models import Job
+from src.core.ratings.models import Rating
+from src.core.resumes.models import Resume
+from src.core.settings import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

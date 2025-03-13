@@ -17,10 +17,10 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.jobs import Job, JobGetSchema, JobRepository, JobStatus
-from src.ratings import Rating, RatingRepository, RatingSchema, Role
-from src.resumes import Resume, ResumeCreateSchema, ResumeRepository
-from src.settings import settings
+from src.core.jobs import Job, JobGetSchema, JobRepository, JobStatus
+from src.core.ratings import Rating, RatingRepository, RatingSchema, Role
+from src.core.resumes import Resume, ResumeCreateSchema, ResumeRepository
+from src.core.settings import settings
 
 faker = Faker()
 

@@ -3,8 +3,8 @@
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.jobs import Job, JobGetSchema, JobListGetSchema
-from src.jobs.router import router as job_router
+from src.api.jobs.router import router as job_router
+from src.core.jobs import Job, JobGetSchema, JobListGetSchema
 from tests.integration.conftest import BaseTestRouter
 
 

@@ -2,9 +2,9 @@
 
 import httpx
 
-from src.jobs import Job
-from src.resumes import Resume, ResumeGetSchema
-from src.resumes.router import router as resume_router
+from src.api.resumes.router import router as resume_router
+from src.core.jobs import Job
+from src.core.resumes import Resume, ResumeGetSchema
 from tests.integration.conftest import BaseTestRouter
 
 
