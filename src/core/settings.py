@@ -4,7 +4,12 @@ import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ENV_FILE_PATH = os.path.join("app", ".env")
+ENV_FILE_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..",
+    "..",
+    ".env",
+)
 
 
 class CoreSettings(BaseSettings):
@@ -24,7 +29,7 @@ class CoreSettings(BaseSettings):
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
-    model_config = SettingsConfigDict(env_file=ENV_FILE_PATH)
+    model_config = SettingsConfigDict(env_file=ENV_FILE_PATH, extra="ignore")
 
 
 settings = CoreSettings()

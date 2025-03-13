@@ -5,7 +5,12 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ENV_FILE_PATH = os.path.join("app", ".env")
+ENV_FILE_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..",
+    "..",
+    ".env",
+)
 
 
 class APISettings(BaseSettings):
@@ -17,7 +22,7 @@ class APISettings(BaseSettings):
     # Security
     CORS_ORIGINS: list[str]
 
-    model_config = SettingsConfigDict(env_file=ENV_FILE_PATH)
+    model_config = SettingsConfigDict(env_file=ENV_FILE_PATH, extra="ignore")
 
 
 settings = APISettings()
