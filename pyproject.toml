@@ -3,12 +3,14 @@ name = "p2p-steam"
 version = "0.1.0"
 description = "P2P Steam Platform"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 dependencies = [
     "asyncpg>=0.30.0",
     "fastapi[all]>=0.115.6",
     "sqlalchemy>=2.0.37",
     "pyjwt>=2.10.1",
+    "aiohttp>=3.11.13",
+    "web3>=7.8.0",
 ]
 
 [dependency-groups]
@@ -37,5 +39,5 @@ extend-select = ["E"]
 
 [tool.ruff.lint.per-file-ignores]
 "env.py" = ["F401", "F811"]
-"src/users/models/user.py" = ["F821"]
+"**/models.py" = ["F821"]
 "**/__init__.py" = ["F403"]

@@ -1,8 +1,9 @@
 """Основной модуль `conftest` для всех тестов."""
 
 import asyncio
+import datetime
+import random
 import sys
-import uuid
 from typing import AsyncGenerator
 
 import pytest
@@ -16,12 +17,10 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-import src.auth.schemas as auth_schemas
-import src.users.schemas as user_schemas
-from src import utils
-from src.auth import JWTService
-from src.settings import settings
-from src.users import UserModel
+from src.core.jobs import Job, JobGetSchema, JobRepository, JobStatus
+from src.core.ratings import Rating, RatingRepository, RatingSchema, Role
+from src.core.resumes import Resume, ResumeCreateSchema, ResumeRepository
+from src.core.settings import settings
 
 faker = Faker()
 
@@ -124,75 +123,68 @@ def output_to_stdout():
     sys.stdout = sys.stderr
 
 
-# MARK: Users
-@pytest_asyncio.fixture
-async def user_db(session: AsyncSession) -> UserModel:
-    """Добавить пользователя в БД."""
+# MARK: Jobs
+@pytest.fixture()
+async def job_db(session: AsyncSession) -> Job:
+    """Создание работы в базе данных"""
 
-    user_db = UserModel(
-        id=str(uuid.uuid4()),
-        email=faker.email(),
-        hashed_password=utils.get_hash(faker.password()),
+    job = await JobRepository.create(
+        session,
+        JobGetSchema(
+            id=random.randint(1, 1000),
+            employer_address=faker.word(),
+            payment=random.randint(1, 1000),
+            deadline=faker.date_time(),
+            description=faker.text(),
+            skills=[faker.word() for _ in range(random.randint(1, 10))],
+            applications=[],
+            employee_address=faker.word(),
+            status=JobStatus.COMPLETED,
+            created_at=faker.date_time(end_datetime=datetime.datetime.now()),
+        ),
     )
-    session.add(user_db)
+
     await session.commit()
 
-    return user_db
+    return job
 
 
-@pytest_asyncio.fixture
-async def user_admin_db(session: AsyncSession) -> UserModel:
-    """Добавить пользователя-администратора в БД."""
+# MARK: Resumes
+@pytest.fixture()
+async def resume_db(session: AsyncSession, job_db: Job) -> Resume:
+    """Создание резюме в базе данных"""
 
-    user_admin = UserModel(
-        id=str(uuid.uuid4()),
-        email=faker.email(),
-        hashed_password=utils.get_hash(faker.password()),
-        is_admin=True,
+    resume = await ResumeRepository.create(
+        session,
+        ResumeCreateSchema(
+            person_address=job_db.employee_address,
+            role=Role.EMPLOYEE,
+            name=faker.name(),
+            description=faker.text(),
+        ),
     )
-    session.add(user_admin)
+
     await session.commit()
 
-    return user_admin
+    return resume
 
 
-@pytest_asyncio.fixture
-async def user_create_data() -> user_schemas.UserReadAdminSchema:
-    """
-    Подготовленные данные для создания
-    пользователя в БД администратором.
-    """
+# MARK: Ratings
+@pytest.fixture()
+async def rating_db(session: AsyncSession, job_db: Job) -> Rating:
+    """Создание рейтинга в базе данных"""
 
-    return user_schemas.UserCreateAdminSchema(
-        email=faker.email(),
-        password=faker.password(),
-        is_admin=False,
+    rating = await RatingRepository.create(
+        session,
+        RatingSchema(
+            job_id=job_db.id,
+            rated_person_address=job_db.employee_address,
+            score=random.randint(1, 5),
+            comment=faker.text(),
+            role=Role.EMPLOYEE,
+        ),
     )
 
+    await session.commit()
 
-@pytest_asyncio.fixture
-async def user_update_data() -> user_schemas.UserUpdateAdminSchema:
-    """
-    Подготовленные данные для обновления
-    пользователя в БД администратором.
-    """
-
-    return user_schemas.UserUpdateAdminSchema(
-        email=faker.email(),
-        password=faker.password(),
-        is_admin=True,
-    )
-
-
-@pytest_asyncio.fixture
-async def user_jwt_tokens(user_db: UserModel) -> auth_schemas.JWTGetSchema:
-    """Создать JWT токены  для тестового пользователя."""
-
-    return await JWTService.create_tokens(user_id=user_db.id)
-
-
-@pytest_asyncio.fixture
-async def admin_jwt_tokens(user_admin_db: UserModel) -> auth_schemas.JWTGetSchema:
-    """Создать JWT токены  для тестового пользователя-администратора."""
-
-    return await JWTService.create_tokens(user_id=user_admin_db.id)
+    return rating

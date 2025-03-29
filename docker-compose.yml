@@ -20,7 +20,8 @@ services:
   postgres-dev:
     profiles: [ "dev" ]
     <<: *postgres-base
-    env_file: "./src/.env"
+    env_file:
+      - .env
     ports:
       - 5432:5432
     expose:
@@ -35,7 +36,8 @@ services:
     profiles: [ "dev" ]
     <<: *app-base
     command: uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-    env_file: "./src/.env"
+    env_file:
+      - .env
     volumes:
       - ./:/app
       - /app/.venv
@@ -49,11 +51,29 @@ services:
     networks:
       - dev
 
+  worker-dev:
+    profiles: [ "dev" ]
+    <<: *app-base
+    command: uv run -m worker.main
+    environment:
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      app-dev:
+        condition: service_started
+    networks:
+      - dev
+
   # MARK: Test
   postgres-worker-gw0:
     profiles: [ "test" ]
     <<: *postgres-base
-    env_file: "./src/.env.test"
+    env_file:
+      - .env.test
     environment:
       - POSTGRES_DB=gw0
     networks:
@@ -62,7 +82,8 @@ services:
   postgres-worker-gw1:
     profiles: [ "test" ]
     <<: *postgres-base
-    env_file: "./src/.env.test"
+    env_file:
+      - .env.test
     environment:
       - POSTGRES_DB=gw1
     networks:
@@ -85,7 +106,8 @@ services:
       --rootdir=/app/ \
       --disable-pytest-warnings && \
       coverage html"
-    env_file: "./src/.env.test"
+    env_file:
+      - .env.test
     volumes:
       - ./:/app
       - /app/.venv
